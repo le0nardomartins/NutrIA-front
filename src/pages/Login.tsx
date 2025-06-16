@@ -1,32 +1,79 @@
 import { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { FaEnvelope, FaLock, FaSignInAlt } from 'react-icons/fa';
+import { loginUser, saveUserToLocalStorage, saveTokenToLocalStorage } from '../services/authService';
 
 interface LoginProps {
   onLogin: (userData: any) => void;
+}
+
+interface LocationState {
+  from?: {
+    pathname: string;
+  };
 }
 
 const Login = ({ onLogin }: LoginProps) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState('');
+  const navigate = useNavigate();
+  const location = useLocation();
+  
+  // Obtém a página de origem, se houver
+  const from = (location.state as LocationState)?.from?.pathname || '/welcome';
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
+    setError('');
     
-    // Simulação de login
-    setTimeout(() => {
-      onLogin({ email });
-      window.location.href = '/welcome';
+    console.log('Enviando dados de login:', { email, password });
+    
+    try {
+      // Enviamos email e senha para o backend
+      const loginResult = await loginUser(email, password);
+      console.log("Resultado do login:", loginResult);
+      
+      // Se o login for bem-sucedido, salvamos os dados do usuário
+      if (loginResult.user) {
+        saveUserToLocalStorage(loginResult.user);
+        if (loginResult.token) {
+          saveTokenToLocalStorage(loginResult.token);
+        }
+        onLogin(loginResult.user);
+        navigate(from); // Redireciona para a página original
+      } else {
+        setError('Erro ao processar login. Tente novamente.');
+      }
+    } catch (err: any) {
+      // Tentar extrair a mensagem de erro da resposta
+      let errorMessage = 'Falha na autenticação. Verifique suas credenciais.';
+      
+      if (err.message && err.message.includes('401')) {
+        errorMessage = 'Senha incorreta. Por favor, verifique suas credenciais.';
+      } else if (err.message && err.message.includes('404')) {
+        errorMessage = 'Usuário não encontrado. Verifique seu e-mail ou registre-se.';
+      }
+      
+      setError(errorMessage);
+      console.error('Erro de login:', err);
+    } finally {
       setIsLoading(false);
-    }, 1000);
+    }
   };
 
   return (
     <div>
       <h2 className="text-3xl font-bold text-black mb-2">Entrar</h2>
       <p className="text-gray-600 mb-8">Análise nutricional inteligente para suas refeições</p>
+      
+      {error && (
+        <div className="mb-4 p-3 bg-red-100 border border-red-400 text-red-700 rounded">
+          {error}
+        </div>
+      )}
       
       <form onSubmit={handleSubmit}>
         <div className="mb-4">

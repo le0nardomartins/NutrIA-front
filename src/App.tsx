@@ -1,5 +1,7 @@
-import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import { AnimatePresence } from 'framer-motion';
+import { useState } from 'react';
+import { getUserFromLocalStorage, removeUserFromLocalStorage } from './services/authService';
 
 // Pages
 import Login from './pages/Login';
@@ -12,7 +14,35 @@ import Profile from './pages/Profile';
 import AuthLayout from './layouts/AuthLayout';
 import AppLayout from './layouts/AppLayout';
 
+// Componente para proteger rotas
+interface ProtectedRouteProps {
+  children: React.ReactNode;
+}
+
+const ProtectedRoute = ({ children }: ProtectedRouteProps) => {
+  const user = getUserFromLocalStorage();
+  const location = useLocation();
+  
+  if (!user) {
+    // Redirecionar para o login, salvando o caminho atual
+    return <Navigate to="/login" state={{ from: location }} replace />;
+  }
+  
+  return <>{children}</>;
+};
+
 function App() {
+  const [, setUser] = useState(getUserFromLocalStorage());
+
+  const handleLogin = (userData: any) => {
+    setUser(userData);
+  };
+
+  const handleLogout = () => {
+    removeUserFromLocalStorage();
+    setUser(null);
+  };
+
   return (
     <Router>
       <AnimatePresence mode="wait">
@@ -22,15 +52,19 @@ function App() {
           
           {/* Auth Routes */}
           <Route path="/login" element={<AuthLayout />}>
-            <Route index element={<Login onLogin={() => {}} />} />
+            <Route index element={<Login onLogin={handleLogin} />} />
           </Route>
           
           <Route path="/register" element={<AuthLayout />}>
             <Route index element={<Register />} />
           </Route>
 
-          {/* App Routes */}
-          <Route element={<AppLayout onLogout={() => {}} />}>
+          {/* App Routes - Protegidas */}
+          <Route element={
+            <ProtectedRoute>
+              <AppLayout onLogout={handleLogout} />
+            </ProtectedRoute>
+          }>
             <Route path="/welcome" element={<Welcome />} />
             <Route path="/analysis" element={<FoodAnalysis />} />
             <Route path="/profile" element={<Profile />} />

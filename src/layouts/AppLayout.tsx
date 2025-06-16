@@ -1,7 +1,8 @@
 import { useState, useEffect, useRef } from 'react';
-import { Outlet, NavLink } from 'react-router-dom';
+import { Outlet, NavLink, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { FaHome, FaCamera, FaSignOutAlt, FaUser, FaBars, FaTimes, FaArrowUp } from 'react-icons/fa';
+import { removeUserFromLocalStorage } from '../services/authService';
 
 interface AppLayoutProps {
   onLogout?: () => void;
@@ -11,12 +12,14 @@ const AppLayout = ({ onLogout }: AppLayoutProps) => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [showScrollTop, setShowScrollTop] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
+  const navigate = useNavigate();
 
   const handleLogout = () => {
+    removeUserFromLocalStorage();
     if (onLogout) {
       onLogout();
     }
-    window.location.href = '/';
+    navigate('/login');
   };
 
   const toggleMobileMenu = () => {
