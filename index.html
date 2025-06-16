@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/logo.png" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <base href="/" />
+    <title>NutrIA - Assistente Nutricional Inteligente</title>
+    <meta name="description" content="Análise nutricional inteligente para suas refeições usando inteligência artificial" />
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script type="text/javascript">
+      // Script para lidar com rotas em hospedagens que não suportam SPA nativo
+      (function() {
+        // Verificar se estamos em uma página 404
+        var segmentCount = 0;
+        var location = window.location;
+        var pathname = location.pathname;
+        
+        // Redirecionar para a raiz em caso de erro 404
+        if (pathname !== '/' && !pathname.includes('.')) {
+          sessionStorage.setItem('redirect', pathname);
+          window.location.href = '/';
+        }
+      })();
+    </script>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>
