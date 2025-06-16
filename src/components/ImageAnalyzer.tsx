@@ -18,7 +18,6 @@ interface UserProfileData {
   goal: string;
 }
 
-<<<<<<< HEAD
 // Interface para os dados da análise nutricional
 interface NutritionalAnalysis {
   calorias: number;
@@ -35,8 +34,6 @@ interface NutritionalAnalysis {
   comentario_nutria: string;
 }
 
-=======
->>>>>>> 596b56b88272d7fa850d6b51d7fcf486161b053c
 // Estilo para posicionar o widget no canto inferior direito
 const widgetStyle = `
   .elevenlabs-convai-widget {
@@ -51,10 +48,7 @@ const ImageAnalyzer = () => {
   const [selectedImage, setSelectedImage] = useState<File | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const [analysis, setAnalysis] = useState<string | null>(null);
-<<<<<<< HEAD
   const [parsedAnalysis, setParsedAnalysis] = useState<NutritionalAnalysis | null>(null);
-=======
->>>>>>> 596b56b88272d7fa850d6b51d7fcf486161b053c
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
   const [userProfile, setUserProfile] = useState<UserProfileData | null>(null);
@@ -181,10 +175,7 @@ const ImageAnalyzer = () => {
       
       // Limpar análise anterior
       setAnalysis(null);
-<<<<<<< HEAD
       setParsedAnalysis(null);
-=======
->>>>>>> 596b56b88272d7fa850d6b51d7fcf486161b053c
       setError(null);
     }
   };
@@ -204,7 +195,6 @@ const ImageAnalyzer = () => {
         selectedImage, 
         useProfileData && userProfile ? userProfile : undefined
       );
-<<<<<<< HEAD
       
       setAnalysis(result);
       
@@ -226,9 +216,6 @@ const ImageAnalyzer = () => {
         console.error('Erro ao fazer parse do JSON:', jsonError);
       }
       
-=======
-      setAnalysis(result);
->>>>>>> 596b56b88272d7fa850d6b51d7fcf486161b053c
     } catch (err) {
       setError((err as Error).message);
     } finally {
@@ -248,37 +235,44 @@ const ImageAnalyzer = () => {
 
   return (
     <div className="flex flex-col items-center p-4 md:p-6 bg-white rounded-lg shadow-md max-w-2xl mx-auto">
-      <h2 className="text-xl md:text-2xl font-bold mb-4 md:mb-6 text-gray-800">Analisador de Imagem</h2>
+      <h2 className="text-xl md:text-2xl font-bold mb-4 md:mb-6 text-gray-800">Análise Nutricional</h2>
       
-      <div className="w-full mb-4 md:mb-6">
-        <input
-          type="file"
-          accept="image/*"
-          onChange={handleImageChange}
-          className="hidden"
-          ref={fileInputRef}
-        />
-        
-        <button
-          onClick={handleSelectImageClick}
-          className="w-full py-2 md:py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm md:text-base"
-        >
-          Selecionar Imagem
-        </button>
-      </div>
-
-      {previewUrl && (
-        <div className="w-full mb-4 md:mb-6">
-          <div className="aspect-w-16 aspect-h-9 w-full overflow-hidden rounded-lg">
-            <img
-              src={previewUrl}
-              alt="Preview"
-              className="object-cover w-full h-full"
+      {/* Entrada de arquivo oculta */}
+      <input 
+        type="file" 
+        accept="image/*" 
+        onChange={handleImageChange} 
+        className="hidden" 
+        ref={fileInputRef}
+      />
+      
+      {/* Área de upload de imagem */}
+      <div 
+        className={`w-full border-2 border-dashed rounded-lg p-4 md:p-6 mb-4 md:mb-6 text-center cursor-pointer
+          ${previewUrl ? 'border-green-300 bg-green-50' : 'border-gray-300 hover:border-green-300 bg-gray-50 hover:bg-green-50'}`}
+        onClick={handleSelectImageClick}
+      >
+        {previewUrl ? (
+          <div className="flex flex-col items-center">
+            <img 
+              src={previewUrl} 
+              alt="Preview" 
+              className="max-h-64 max-w-full mb-3 rounded-lg" 
             />
+            <p className="text-sm text-gray-600">Clique para selecionar outra imagem</p>
           </div>
-        </div>
-      )}
-
+        ) : (
+          <div className="flex flex-col items-center py-4 md:py-8">
+            <svg className="w-12 h-12 text-gray-400 mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+            </svg>
+            <p className="text-lg font-medium text-gray-700 mb-1">Selecione uma imagem</p>
+            <p className="text-sm text-gray-500">ou arraste e solte aqui</p>
+          </div>
+        )}
+      </div>
+      
+      {/* Opção para usar dados do perfil */}
       {userProfile && (
         <div className="w-full mb-4 md:mb-6 flex items-center">
           <input
@@ -286,151 +280,122 @@ const ImageAnalyzer = () => {
             id="useProfileData"
             checked={useProfileData}
             onChange={handleToggleProfileData}
-            className="h-4 w-4 text-green-600 focus:ring-green-500 border-gray-300 rounded mr-2"
+            className="h-4 w-4 text-green-600 focus:ring-green-500 border-gray-300 rounded"
           />
-          <label htmlFor="useProfileData" className="text-xs md:text-sm text-gray-700">
-            Incluir dados do meu perfil na análise
+          <label htmlFor="useProfileData" className="ml-2 text-sm text-gray-700">
+            Usar meus dados de perfil para personalizar a análise
           </label>
-          
-          {useProfileData && (
-            <div className="ml-auto">
-              <Link 
-                to="/profile" 
-                className="text-xs md:text-sm text-blue-600 hover:text-blue-800 underline"
-              >
-                Editar perfil
-              </Link>
-            </div>
-          )}
         </div>
       )}
-
-      {!userProfile && (
-        <div className="w-full mb-4 md:mb-6 p-3 md:p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
-          <p className="text-xs md:text-sm text-yellow-700">
-            Você ainda não configurou seu perfil nutricional. 
-            <Link to="/profile" className="ml-1 text-blue-600 hover:text-blue-800 underline">
-              Configurar agora
-            </Link>
-          </p>
-        </div>
-      )}
-
+      
+      {/* Botão de análise */}
       <button
         onClick={handleAnalyzeClick}
         disabled={!selectedImage || loading}
-        className={`w-full py-2 md:py-3 ${
-          !selectedImage || loading
-            ? 'bg-gray-400 cursor-not-allowed'
-            : 'bg-green-600 hover:bg-green-700'
-        } text-white rounded-lg transition-colors mb-4 md:mb-6 text-sm md:text-base`}
+        className={`w-full py-3 rounded-lg font-medium text-white flex items-center justify-center
+          ${!selectedImage || loading ? 'bg-gray-400 cursor-not-allowed' : 'bg-green-600 hover:bg-green-700'}`}
       >
-        {loading ? 'Analisando...' : 'Analisar Imagem'}
+        {loading ? (
+          <>
+            <svg className="animate-spin -ml-1 mr-2 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+              <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+              <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+            </svg>
+            Analisando...
+          </>
+        ) : (
+          'Analisar Imagem'
+        )}
       </button>
-
+      
+      {/* Mensagem de erro */}
       {error && (
-        <div className="w-full p-3 md:p-4 bg-red-100 border border-red-300 rounded-lg mb-4 md:mb-6">
-          <p className="text-xs md:text-sm text-red-700">{error}</p>
+        <div className="w-full mt-4 p-3 bg-red-50 border border-red-200 rounded-lg text-red-700 text-sm">
+          <p>{error}</p>
         </div>
       )}
-
-<<<<<<< HEAD
+      
+      {/* Resultados da análise */}
       {parsedAnalysis && (
-        <div className="w-full p-3 md:p-4 bg-gray-100 border border-gray-300 rounded-lg">
-          <h3 className="text-lg md:text-xl font-semibold mb-3 text-gray-800">Resultado da Análise:</h3>
+        <div className="w-full mt-6 md:mt-8">
+          <h3 className="text-lg md:text-xl font-semibold mb-3 md:mb-4 text-gray-800">Resultados da Análise</h3>
           
-          {/* Calorias e Macronutrientes */}
-          <div className="mb-4">
-            <div className="flex justify-between items-center mb-2">
-              <h4 className="font-medium text-gray-800">Calorias:</h4>
-              <span className="text-green-600 font-semibold">{parsedAnalysis.calorias} kcal</span>
+          {/* Calorias e macronutrientes */}
+          <div className="bg-green-50 border border-green-100 rounded-lg p-4 mb-4">
+            <div className="flex justify-between items-center mb-3">
+              <h4 className="font-medium text-gray-800">Calorias</h4>
+              <span className="text-lg font-bold text-green-700">{parsedAnalysis.calorias} kcal</span>
             </div>
             
-            <h4 className="font-medium text-gray-800 mb-2">Macronutrientes:</h4>
-            <div className="grid grid-cols-3 gap-2 mb-2">
-              <div className="bg-blue-50 p-2 rounded-lg text-center">
-                <div className="text-xs text-gray-600">Carboidratos</div>
-                <div className="font-semibold text-blue-600">{parsedAnalysis.macronutrientes.carboidratos_g}g</div>
+            <h4 className="font-medium text-gray-800 mb-2">Macronutrientes</h4>
+            <div className="grid grid-cols-3 gap-2 text-center">
+              <div className="bg-white p-2 rounded border border-gray-200">
+                <p className="text-xs text-gray-500">Carboidratos</p>
+                <p className="font-semibold text-gray-800">{parsedAnalysis.macronutrientes.carboidratos_g}g</p>
               </div>
-              <div className="bg-red-50 p-2 rounded-lg text-center">
-                <div className="text-xs text-gray-600">Proteínas</div>
-                <div className="font-semibold text-red-600">{parsedAnalysis.macronutrientes.proteinas_g}g</div>
+              <div className="bg-white p-2 rounded border border-gray-200">
+                <p className="text-xs text-gray-500">Proteínas</p>
+                <p className="font-semibold text-gray-800">{parsedAnalysis.macronutrientes.proteinas_g}g</p>
               </div>
-              <div className="bg-yellow-50 p-2 rounded-lg text-center">
-                <div className="text-xs text-gray-600">Gorduras</div>
-                <div className="font-semibold text-yellow-600">{parsedAnalysis.macronutrientes.gorduras_g}g</div>
+              <div className="bg-white p-2 rounded border border-gray-200">
+                <p className="text-xs text-gray-500">Gorduras</p>
+                <p className="font-semibold text-gray-800">{parsedAnalysis.macronutrientes.gorduras_g}g</p>
               </div>
             </div>
           </div>
           
-          {/* Micronutrientes */}
-          {parsedAnalysis.micronutrientes && Object.keys(parsedAnalysis.micronutrientes).length > 0 && (
-            <div className="mb-4">
-              <h4 className="font-medium text-gray-800 mb-2">Micronutrientes:</h4>
-              <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
-                {Object.entries(parsedAnalysis.micronutrientes).map(([key, value]) => (
-                  <div key={key} className="bg-green-50 p-2 rounded-lg">
-                    <div className="text-xs text-gray-600">{key.replace(/_/g, ' ')}</div>
-                    <div className="font-semibold text-green-600">{value}</div>
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
-          
           {/* Ingredientes */}
           <div className="mb-4">
-            <h4 className="font-medium text-gray-800 mb-2">Ingredientes:</h4>
-            <div className="flex flex-wrap gap-2">
+            <h4 className="font-medium text-gray-800 mb-2">Ingredientes Identificados</h4>
+            <ul className="bg-white border border-gray-200 rounded-lg p-3 list-disc pl-5 text-sm text-gray-700">
               {parsedAnalysis.ingredientes.map((ingrediente, index) => (
-                <span key={index} className="bg-gray-200 text-gray-700 px-2 py-1 rounded-full text-xs">
-                  {ingrediente}
-                </span>
+                <li key={index} className="mb-1">{ingrediente}</li>
               ))}
-            </div>
+            </ul>
           </div>
           
           {/* Recomendações */}
           <div className="mb-4">
-            <h4 className="font-medium text-gray-800 mb-2">Recomendações:</h4>
-            <ul className="list-disc pl-5 text-xs md:text-sm text-gray-700 space-y-1">
+            <h4 className="font-medium text-gray-800 mb-2">Recomendações</h4>
+            <ul className="bg-white border border-gray-200 rounded-lg p-3 list-disc pl-5 text-sm text-gray-700">
               {parsedAnalysis.recomendacoes.map((recomendacao, index) => (
-                <li key={index}>{recomendacao}</li>
+                <li key={index} className="mb-1">{recomendacao}</li>
               ))}
             </ul>
           </div>
           
           {/* Comentário da Nutria */}
           {parsedAnalysis.comentario_nutria && (
-            <div className="bg-green-50 p-3 rounded-lg border border-green-200">
-              <h4 className="font-medium text-green-800 mb-1">Comentário da Nutria:</h4>
-              <p className="text-xs md:text-sm text-gray-700">{parsedAnalysis.comentario_nutria}</p>
+            <div className="bg-green-50 border border-green-100 rounded-lg p-4">
+              <h4 className="font-medium text-gray-800 mb-2 flex items-center">
+                <span className="mr-2">🤖</span>
+                Comentário da NutrIA
+              </h4>
+              <p className="text-sm text-gray-700">{parsedAnalysis.comentario_nutria}</p>
             </div>
           )}
-          
-          <div className="mt-4 p-3 bg-blue-50 border border-blue-200 rounded-lg">
-            <p className="text-xs md:text-sm text-blue-700">
-              Um assistente virtual foi ativado no canto inferior direito da tela.
-              Converse com ele para tirar dúvidas sobre esta análise!
-            </p>
+        </div>
+      )}
+      
+      {/* Análise em texto (caso não consiga fazer parse do JSON) */}
+      {analysis && !parsedAnalysis && (
+        <div className="w-full mt-6 md:mt-8">
+          <h3 className="text-lg md:text-xl font-semibold mb-3 md:mb-4 text-gray-800">Resultados da Análise</h3>
+          <div className="bg-white border border-gray-200 rounded-lg p-4 text-sm text-gray-700 whitespace-pre-wrap">
+            {analysis}
           </div>
         </div>
       )}
       
-      {analysis && !parsedAnalysis && (
-=======
-      {analysis && (
->>>>>>> 596b56b88272d7fa850d6b51d7fcf486161b053c
-        <div className="w-full p-3 md:p-4 bg-gray-100 border border-gray-300 rounded-lg">
-          <h3 className="text-lg md:text-xl font-semibold mb-2 text-gray-800">Resultado da Análise:</h3>
-          <pre className="whitespace-pre-wrap text-xs md:text-sm text-gray-700 overflow-x-auto">{analysis}</pre>
-          
-          <div className="mt-4 p-3 bg-blue-50 border border-blue-200 rounded-lg">
-            <p className="text-xs md:text-sm text-blue-700">
-              Um assistente virtual foi ativado no canto inferior direito da tela.
-              Converse com ele para tirar dúvidas sobre esta análise!
-            </p>
-          </div>
+      {/* Link para o perfil */}
+      {!userProfile && analysis && (
+        <div className="w-full mt-4 p-3 bg-yellow-50 border border-yellow-200 rounded-lg">
+          <p className="text-sm text-yellow-700">
+            Para obter recomendações personalizadas, 
+            <Link to="/profile" className="ml-1 text-green-600 hover:text-green-800 underline">
+              configure seu perfil nutricional
+            </Link>.
+          </p>
         </div>
       )}
     </div>

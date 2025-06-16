@@ -63,7 +63,6 @@ export const analyzeImage = async (imageFile: File, userProfile?: UserProfileDat
     // Converter a imagem para base64
     const base64Image = await imageToBase64(imageFile);
 
-<<<<<<< HEAD
     // Obter a chave da API do ambiente
     // Nota: Para produção, a chave deve ser armazenada em variáveis de ambiente no servidor
     const apiKey = import.meta.env.API_KEY;
@@ -115,56 +114,6 @@ export const analyzeImage = async (imageFile: File, userProfile?: UserProfileDat
 
     if (!apiKey) {
       throw new Error('Chave da API OpenAI não encontrada. Configure a variável de ambiente VITE_OPENAI_API_KEY.');
-=======
-    // Obter as variáveis de ambiente
-    const apiKey = import.meta.env.API_KEY;
-            const aiPrompt = `
-                Você é Nutria, uma Inteligência Artificial especializada em análise nutricional de refeições a partir de imagens.
-
-                **Contexto:**
-                - Recebe imagens de pratos via front-end (arquivo ou webcam).
-                - Retorna um JSON contendo:
-                - \`calorias\`: número aproximado de calorias.
-                - \`macronutrientes\`: \`{ carboidratos_g, proteinas_g, gorduras_g }\`.
-                - \`micronutrientes\` (opcional): vitaminas e minerais principais.
-                - \`ingredientes_est\`. (opcional): lista provável de componentes do prato.
-                - \`recomendacoes\`: sugestões como ajustes, substituições, alertas (ex.: alto teor de sódio).
-                - Pode utilizar informações do usuário (idade, peso, objetivo) para personalizar recomendações.
-
-                **Tarefas da Nutria:**
-                1. **Analisar** a imagem e identificar alimentos presentes.
-                2. **Estimar** porções e calcular valores nutricionais.
-                3. **Gerar recomendações** baseadas no perfil do usuário.
-                4. Responder com JSON estruturado coerente.
-
-                **Formato de resposta (obrigatório):**
-                \`\`\`json
-                {
-                "calorias": 525,
-                "macronutrientes": {
-                    "carboidratos_g": 60,
-                    "proteinas_g": 25,
-                    "gorduras_g": 22
-                },
-                "micronutrientes": {
-                    "vitamina_c_mg": 28,
-                    "ferro_mg": 2.1
-                },
-                "ingredientes": ["arroz branco", "feijão preto", "ovo frito", "salada de alface"],
-                "recomendacoes": [
-                    "Reduzir 1 colher de sopa de óleo no preparo",
-                    "Adicionar uma fonte extra de proteínas (ex: peito de frango)",
-                    "Cuidado: alta quantidade de gordura saturada"
-                ],
-
-                "comentario_nutria": "Ótimo prato! Você combinou proteína, fibras e bons carboidratos. A couve refogada é excelente, só cuidado com o excesso de óleo. Que tal adicionar uma laranja depois do almoço? Isso ajuda seu corpo a aproveitar melhor o ferro do feijão 😉"
-                }
-                \`\`\`
-                `;
-
-    if (!apiKey) {
-      throw new Error('API_KEY não encontrada nas variáveis de ambiente');
->>>>>>> 596b56b88272d7fa850d6b51d7fcf486161b053c
     }
 
     // Preparar informações do usuário para incluir no prompt
@@ -210,11 +159,8 @@ export const analyzeImage = async (imageFile: File, userProfile?: UserProfileDat
       }
     }
 
-<<<<<<< HEAD
     console.log('Enviando imagem para análise na API da OpenAI...');
 
-=======
->>>>>>> 596b56b88272d7fa850d6b51d7fcf486161b053c
     // Configurar a requisição para a API da OpenAI
     const response = await axios.post<OpenAIResponse>(
       'https://api.openai.com/v1/chat/completions',
@@ -223,11 +169,7 @@ export const analyzeImage = async (imageFile: File, userProfile?: UserProfileDat
         messages: [
           {
             role: 'system',
-<<<<<<< HEAD
             content: aiPrompt
-=======
-            content: aiPrompt || 'Analise esta imagem e forneça informações detalhadas sobre ela.'
->>>>>>> 596b56b88272d7fa850d6b51d7fcf486161b053c
           },
           {
             role: 'user',
@@ -245,11 +187,7 @@ export const analyzeImage = async (imageFile: File, userProfile?: UserProfileDat
             ]
           }
         ],
-<<<<<<< HEAD
         max_tokens: 1000
-=======
-        max_tokens: 500
->>>>>>> 596b56b88272d7fa850d6b51d7fcf486161b053c
       },
       {
         headers: {
@@ -259,20 +197,29 @@ export const analyzeImage = async (imageFile: File, userProfile?: UserProfileDat
       }
     );
 
-<<<<<<< HEAD
-    console.log('Resposta recebida da API da OpenAI');
+    // Extrair e retornar o conteúdo da resposta
+    const analysisResult = response.data.choices[0]?.message?.content;
     
-=======
->>>>>>> 596b56b88272d7fa850d6b51d7fcf486161b053c
-    // Retornar a resposta da API
-    return response.data.choices[0].message.content;
-  } catch (error) {
-    if (axios.isAxiosError(error)) {
-      console.error('Erro na requisição para a API da OpenAI:', error.response?.data || error.message);
-      throw new Error(`Erro ao analisar a imagem: ${error.response?.data?.error?.message || error.message}`);
-    } else {
-      console.error('Erro ao analisar a imagem:', error);
-      throw new Error(`Erro ao analisar a imagem: ${(error as Error).message}`);
+    if (!analysisResult) {
+      throw new Error('A API não retornou uma resposta válida');
     }
+    
+    return analysisResult;
+  } catch (error) {
+    console.error('Erro ao analisar imagem:', error);
+    
+    if (axios.isAxiosError(error)) {
+      if (error.response?.status === 401) {
+        throw new Error('Erro de autenticação na API da OpenAI. Verifique sua chave de API.');
+      } else if (error.response?.status === 429) {
+        throw new Error('Limite de requisições excedido. Tente novamente mais tarde.');
+      } else if (error.response) {
+        throw new Error(`Erro na API da OpenAI: ${error.response.data.error?.message || 'Erro desconhecido'}`);
+      } else if (error.request) {
+        throw new Error('Não foi possível conectar à API da OpenAI. Verifique sua conexão com a internet.');
+      }
+    }
+    
+    throw new Error(`Erro ao analisar a imagem: ${(error as Error).message}`);
   }
 }; 
